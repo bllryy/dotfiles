@@ -353,10 +353,11 @@
   (make-directory "~/ctf-notes/" t))
 
 ;; Welcome message
+;; TODO add more
 (setq initial-scratch-message 
       ";; Welcome to CTF Emacs!\n;; Press C-c C-n to create a new challenge\n;; Press C-c t for terminal\n;; Press C-x C-f to open files\n\n")
 
-(message "CTF Emacs configuration loaded! Happy hacking!")
+(message "Emacs configuration loaded!")
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
