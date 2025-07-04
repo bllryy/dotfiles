@@ -345,13 +345,6 @@
 ;; STARTUP
 ;; ===============================================
 
-;; Create CTF directories if they don't exist
-(unless (file-exists-p "~/ctf-challenges/")
-  (make-directory "~/ctf-challenges/" t))
-
-(unless (file-exists-p "~/ctf-notes/")
-  (make-directory "~/ctf-notes/" t))
-
 ;; Welcome message
 ;; TODO add more
 (setq initial-scratch-message 
@@ -359,14 +352,8 @@
 
 (message "Emacs configuration loaded!")
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+
  '(package-selected-packages nil))
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+
  )
