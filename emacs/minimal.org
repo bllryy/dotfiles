@@ -1,0 +1,504 @@
+#+TITLE: Emacs Minimal Configuration
+#+AUTHOR: Leonardo Tamiano (Hexdump)
+#+PROPERTY: header-args :tangle minimal.el
+
+* Init
+  do not ask to follow symlinks
+#+begin_src emacs-lisp
+(setq vc-follow-symlinks t)
+#+end_src
+
+  do not pop into view buffer window associated with async shell commands.
+  #+begin_src emacs-lisp
+(setq display-buffer-alist
+      '(;; no window
+	("*Pwndoc Export*"
+	 (display-buffer-no-window)
+	 (allow-no-window . t)
+	 )
+	("*Async Shell Command*"
+	 (display-buffer-no-window)
+	 (allow-no-window . t)
+	 )
+	("*commands-history*"
+	 (display-buffer-no-window)
+	 (allow-no-window . t)
+	 )
+	))
+  #+end_src
+
+  do not show native comp warnings
+  #+begin_src emacs-lisp
+(setq native-comp-async-report-warnings-errors nil)
+  #+end_src  
+
+* Packages
+  
+** init
+  Bootstrap straight
+  - https://systemcrafters.net/advanced-package-management/using-straight-el/  
+  #+begin_src emacs-lisp
+(let ((bootstrap-file
+      (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+        "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+        'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+  #+end_src
+  
+  Use ~straight.el~ for use-package expressions
+  https://systemcrafters.net/advanced-package-management/using-straight-el/
+  
+  - ~straight-freeze-versions~, to generate lock file
+  - ~straight-pull-all~, ~straight-thaw-versions~ to restore from lock file
+    
+  #+begin_src emacs-lisp
+(straight-use-package 'use-package)
+(require 'use-package)
+  #+end_src
+
+  Define main repositories
+  #+BEGIN_SRC emacs-lisp
+(use-package package
+  :config
+  
+  ;; Set priorities of using melpa-stable.
+  ;; The higher the number, the higher the priority.
+  (setq package-archive-priorities
+	'(("melpa-stable" . 2)
+	  ("MELPA" . 1)
+	  ("gnu" . 0)))
+
+  ;; Add to list melpa stable
+  (setq package-archives
+	`(("melpa-stable" . "https://stable.melpa.org/packages/")
+	  ("MELPA" . "https://melpa.org/packages/")
+	  ("gnu" . "https://elpa.gnu.org/packages/")
+	  ))
+  )
+  #+END_SRC
+   
+** styles & theme
+   #+begin_src emacs-lisp
+(use-package spacemacs-theme
+  :straight t
+  :init
+  (setq spacemacs-theme-comment-bg nil)
+  )
+   #+end_src
+
+** development
+   #+begin_src emacs-lisp
+(use-package magit
+  :straight t
+  :bind (("C-x g" . 'magit-status))
+  )
+   #+end_src
+   
+** completion
+   #+begin_src emacs-lisp
+(use-package ivy
+  :straight t
+  :config
+  (ivy-mode 1)
+  
+  (setq ivy-re-builders-alist
+	'((swiper . ivy--regex-plus)
+          (t      . ivy--regex-fuzzy)))
+
+  ;; useful when using ivy-posframe to make sure that long lines are
+  ;; still visible.
+  (setq ivy-truncate-lines nil)  
+  )
+   #+end_src
+   
+** terminal
+   #+begin_src emacs-lisp
+(use-package better-shell
+  :straight t
+  )
+   #+end_src
+
+   #+begin_src emacs-lisp
+(use-package eterm-256color
+  :straight t
+  :hook (term-mode . eterm-256color-mode)
+  ) 
+   #+end_src
+
+   https://github.com/akermu/emacs-libvterm    
+   Install external library by using ~pacman -S libvterm~.    
+    #+begin_src emacs-lisp
+(use-package vterm
+  :straight t
+  :bind*(:map vterm-mode-map
+	      ("C-x C-k" . vterm-copy-mode)
+	      :map vterm-copy-mode-map
+	      ("C-x C-k" . vterm-copy-mode))
+  :config
+  (setq vterm-max-scrollback 100000)
+  )
+    #+end_src
+    
+    #+begin_src emacs-lisp
+(use-package multi-vterm
+  :straight t
+  )
+    #+end_src
+    
+** org-mode
+   #+BEGIN_SRC emacs-lisp
+(use-package org
+  :straight t
+
+  :config
+  (require 'org-tempo)  ;; to use <-s for expanding into blkc src
+  (require 'org-crypt)
+  (require 'epa-file)
+
+  (epa-file-enable)  
+  (org-crypt-use-before-save-magic)       
+  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+  (setq org-crypt-key nil)
+
+  (setq org-ellipsis " ▼")
+  
+  (setq org-adapt-indentation t)
+
+  (setq org-todo-keywords  '((sequence "TODO" "DOING REVIEW" "|" "DONE" "ARCHIVED")))
+
+  ;; Setting Colours (faces) for todo states to give clearer view of work 
+  (setq org-todo-keyword-faces
+	'(("TODO" . "BlueViolet")
+	  ("DOING" . "yellow")
+	  ("BLOCKED" . "red")
+	  ("REVIEW" . "DarkOrange")
+	  ("DONE" . "LawnGreen")
+	  ("ARCHIVED" .  "RoyalBlue")))
+
+  ;; Hide markup elements in org-mode
+  (setq org-hide-emphasis-markers nil)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (C . t)
+     (lisp . t)
+     (shell . t)
+     (scheme . t)
+     (python . t)))
+
+  ;; https://www.reddit.com/r/emacs/comments/4fus4i/tree_structure_using_capture_in_org_mode/
+  (setq org-refile-targets '((nil :maxlevel . 3) (org-agenda-files :maxlevel . 3)))
+  (setq org-refile-use-outline-path 'file org-outline-path-complete-in-steps nil)
+  )
+   #+END_SRC
+
+** notes
+   
+   #+begin_src emacs-lisp
+(use-package denote
+  :straight t
+  :config
+  (setq denote-directory (expand-file-name "~/notes/denote"))
+  
+  (setq denote-save-buffers nil)
+  (setq denote-known-keywords
+	'("emacs" "projects" "programming"
+	  "books" "math" "activities" "life" "activities"
+	  "writing" "network" "movie" "tv"
+	  "security" "system" "tool"
+	  )
+	)
+  
+  (setq denote-infer-keywords t)
+  (setq denote-sort-keywords t)
+  (setq denote-file-type nil) ; Org is the default, set others here
+  (setq denote-prompts '(title keywords))
+  (setq denote-excluded-directories-regexp nil)
+  (setq denote-excluded-keywords-regexp nil)
+  (setq denote-rename-confirmations '(rewrite-front-matter modify-file-name))
+
+  (denote-rename-buffer-mode 1)
+  (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+  )
+   #+end_src
+   
+* General
+
+** Looks & Feel
+  extra-themes and fonts
+  #+begin_src emacs-lisp
+(set-fontset-font "fontset-default" nil  (font-spec :size 20 :name "Symbola"))  
+  #+end_src
+
+  Modeline stuff
+     #+begin_src emacs-lisp
+(setq display-time-default-load-average nil)
+     #+end_src 
+
+  Various UI stuff
+#+begin_src emacs-lisp
+(display-time)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+(tool-bar-mode 0) ;; Turn off the toolbar
+#+end_src
+
+** Configuration
+Set prefer coding system
+#+begin_src emacs-lisp
+(prefer-coding-system 'utf-8-unix)
+#+end_src
+
+Simple type 'y' for 'yes' and 'n' for 'no'.
+#+begin_src emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+  #+begin_src emacs-lisp
+(setq confirm-kill-processes nil)
+
+;; Set global value for paragraph width
+(setq-default fill-column 70)
+
+;; Stop emacs from losing informations.
+(setq undo-limit 20000000)
+(setq undo-strong-limit 40000000)
+
+;; Smooth scroll
+(setq scroll-step 3)
+(setq line-number-mode t)
+(setq inhibit-startup-screen t)
+(setq ring-bell-function (quote ignore))
+
+;; add column number in the main bar
+(column-number-mode)
+(global-visual-line-mode)
+
+(setq next-line-add-newlines nil)
+(setq-default truncate-lines t)
+(setq truncate-partial-width-windows nil)
+
+;; split vertically when doing switch-to-buffer-other-window
+;; source: https://superuser.com/questions/55466/how-can-i-change-switch-to-buffer-other-window-to-split-vertically-instead-of-ho
+(setq split-width-threshold nil)
+  #+end_src
+
+  #+BEGIN_SRC emacs-lisp 
+(eval-after-load "dired-aux"
+  '(add-to-list 'dired-compress-file-suffixes 
+		'("\\.zip\\'" ".zip" "unzip")))  
+
+;; Set font to be used
+(add-to-list 'default-frame-alist '(font . "Liberation Mono-11.5"))
+(set-face-attribute 'default t :font "Liberation Mono-11.5")
+  #+END_SRC
+  
+This is set to ~nil~ to make sure that when executing ~shell-command~
+the output is always sent in the ~*Shell Output Buffer*~. 
+
+NOTE: if put to ~nil~ then LSP won't show interactive menu when
+opening new project.
+
+  #+begin_src emacs-lisp
+(setq resize-mini-windows 'grow-only)
+  #+end_src
+
+When using authentication, do not ask if I want to save credentials
+to files such as ~.authinfo~. 
+#+begin_src emacs-lisp
+(setq auth-source-save-behavior nil)
+#+end_src
+
+Grep command, where
+- ~H~ is for the filename
+- ~n~ for line number
+- ~null~ for concatenating filename to line
+- ~r~ for making it recursive
+#+begin_src emacs-lisp
+(setq grep-command "grep --color=auto -nrH --null")
+#+end_src
+
+  use chromium for the browser
+  #+begin_src emacs-lisp
+(setq browse-url-browser-function 'browse-url-chromium)
+  #+end_src
+
+** Hooks
+   This hook allows me to execute ~orb-babel~tangle~ when I'm editing my
+   config file simply by saving it.   
+   #+begin_src emacs-lisp
+(setq env/dotemacs-path (expand-file-name "~/dotfiles/emacs/minimal.org"))
+
+(add-hook 'org-mode-hook
+	  (lambda ()
+            (when (or (equal (buffer-file-name) env/dotemacs-path))
+	      (add-hook 'after-save-hook
+			(lambda ()
+			  (org-babel-tangle)
+			  (message "Dotfile tangled"))
+			nil
+			t			
+			)
+              )))
+   #+end_src
+
+    Show line number in the left side of the buffer in certain buffers
+    #+begin_src emacs-lisp
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'conf-mode-hook #'display-line-numbers-mode)
+    #+end_src
+
+    Auto-update dired buffer
+   #+begin_src emacs-lisp
+(add-hook 'dired-mode-hook 'auto-revert-mode)
+   #+end_src
+  
+   Compilation buffer should now interpet ANSI control sequences correctly
+   #+begin_src emacs-lisp
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+   #+end_src
+
+  Functions to call after output is inserted into the buffer.
+  Interpret OSC escape sequences in comint output.
+   #+begin_src emacs-lisp
+(add-hook 'comint-output-filter-functions #'comint-osc-process-output)
+   #+end_src
+
+** Indentation
+   #+BEGIN_SRC emacs-lisp
+;; nil value means 'do not set tabs, ever!'
+(setq-default tab-stop-list nil)
+(setq-default indent-tabs-mode nil)
+(setq-default standard-indent 2)
+
+(setq org-src-preserve-indentation 't)
+   #+END_SRC
+   
+** Backups
+   #+BEGIN_SRC emacs-lisp
+(unless (file-exists-p "~/.emacs.d/.auto_saves/")
+  (make-directory "~/.emacs.d/.auto_saves/")
+  )
+
+(setq make-backup-files nil
+      auto-save-default t
+      auto-save-timeout 1
+      auto-save-interval 300
+      auto-save-file-name-transforms '((".*" "~/.emacs.d/.auto_saves/" t))
+      create-lockfiles nil)
+
+;; Avoid "file name too long" when creating a copy of a file that is
+;; too long by compusing the hash of its full path.
+;;
+;; Ref: https://emacs.stackexchange.com/questions/48301/spacemacs-and-file-name-too-long-error-on-auto-save
+(advice-add 'make-auto-save-file-name :around
+            #'my/shorten-auto-save-file-name)
+(defun my/shorten-auto-save-file-name (&rest args)
+  (let ((buffer-file-name
+         (when buffer-file-name (sha1 buffer-file-name))))
+    (apply args)))
+   #+END_SRC
+
+** Extensions
+   Accepted file extensions and their appropriate modes.
+   #+BEGIN_SRC emacs-lisp
+(setq auto-mode-alist
+      (append
+       '(("\\.cpp$"    . c++-mode)
+	 ("\\.hin$"    . c++-mode)
+	 ("\\.cin$"    . c++-mode)
+	 ("\\.inl$"    . c++-mode)
+	 ("\\.rdc$"    . c++-mode)
+	 ("\\.h$"      . c++-mode)
+	 ("\\.c$"      . c++-mode)
+	 ("\\.cc$"     . c++-mode)
+	 ("\\.c8$"     . c++-mode)
+	 ("\\.txt$"    . indented-text-mode)
+	 ("\\.emacs$"  . emacs-lisp-mode)
+	 ("\\.gen$"    . gen-mode)
+	 ("\\.ms$"     . fundamental-mode)
+	 ("\\.m$"      . objc-mode)
+	 ("\\.mm$"     . objc-mode)
+	 ("\\.asm$"    . asm86-mode)
+	 ("\\.inc$"    . asm86-mode)
+	 ("\\.ts"      . typescript-ts-mode)
+	 ) auto-mode-alist))
+   #+END_SRC
+
+   All configuration files associated with conf-mode
+   #+BEGIN_SRC emacs-lisp
+(setq auto-mode-alist
+      (append
+       '((".offlineimaprc"   . conf-mode)
+	 (".moc.conf"        . conf-mode)
+	 ("github_blog.prf"  . conf-mode)
+	 ("knwl_org.prf"     . conf-mode)
+	 ("public_org.prf"   . conf-mode)
+	 ("i3config"         . conf-mode)
+	 (".i3blocks.conf"   . conf-mode)
+	 (".compton.conf"    . conf-mode)
+	 (".gitconfig"       . conf-mode)
+	 ) auto-mode-alist))
+   #+END_SRC
+
+** Colors
+
+   #+begin_src emacs-lisp
+(setq fixme-modes '(c++-mode c-mode emacs-lisp-mode latex-mode scheme-mode python-mode))
+(make-face 'font-lock-fixme-face)
+(make-face 'font-lock-note-face)
+(make-face 'font-lock-important-face)
+(make-face 'font-lock-debug-face)
+   #+end_src
+   
+   #+BEGIN_SRC emacs-lisp
+(mapc (lambda (mode)
+	(font-lock-add-keywords
+	 mode
+	 '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+	   ("\\<\\(DEBUG\\)" 1 'font-lock-debug-face t)
+	   ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
+	   ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+      fixme-modes)
+   #+END_SRC
+
+   #+begin_src emacs-lisp
+(modify-face 'font-lock-fixme-face "Magenta" nil nil t nil t nil nil)
+(modify-face 'font-lock-debug-face "DarkOrange" nil nil t nil t nil nil)
+(modify-face 'font-lock-important-face "Red" nil nil t nil t nil nil)
+(modify-face 'font-lock-note-face "DeepSkyBlue" nil nil t nil t nil nil)
+   #+end_src
+  
+** Keybinds
+
+   #+begin_src emacs-lisp
+(global-set-key (kbd "C-c q") 'query-replace)
+(global-set-key (kbd "C-c m") 'comment-region)
+(global-set-key (kbd "C-c n") 'uncomment-region)
+(global-set-key (kbd "C-x g") #'magit-status)
+(global-set-key (kbd "C-c s") #'my/denote--find-note-by-title)
+   #+end_src
+
+* End
+  load choosen theme
+  #+begin_src emacs-lisp
+(load-theme 'spacemacs-dark t)
+  #+end_src
+
+  Startup buffer with term  
+  #+begin_src emacs-lisp
+(setq env/terminal-path (replace-regexp-in-string "\n$" "" (shell-command-to-string "which bash")))
+
+(unless (= (length env/terminal-path) 0)
+  (multi-vterm)
+  (setq display-line-numbers nil)
+  )
+  #+end_src  
+
