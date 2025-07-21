@@ -1,6 +1,0 @@
-2025/07/21-00:43:07.134 876 Reusing MANIFEST /home/lily/.config/chromium/Default/IndexedDB/https_www.youtube.com_0.indexeddb.leveldb/MANIFEST-000001
-2025/07/21-00:43:07.134 876 Recovering log #3
-2025/07/21-00:43:07.136 876 Reusing old log /home/lily/.config/chromium/Default/IndexedDB/https_www.youtube.com_0.indexeddb.leveldb/000003.log 
-2025/07/21-00:44:36.806 86a Level-0 table #5: started
-2025/07/21-00:44:36.820 86a Level-0 table #5: 1417647 bytes OK
-2025/07/21-00:44:36.822 86a Delete type=0 #3
