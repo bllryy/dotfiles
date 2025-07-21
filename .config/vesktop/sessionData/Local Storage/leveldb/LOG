@@ -1,0 +1,18 @@
+2025/07/21-10:49:15.021 6b5 Reusing MANIFEST /home/lily/.config/vesktop/sessionData/Local Storage/leveldb/MANIFEST-000001
+2025/07/21-10:49:15.037 6b5 Recovering log #30
+2025/07/21-10:49:15.037 6b5 Reusing old log /home/lily/.config/vesktop/sessionData/Local Storage/leveldb/000030.log 
+2025/07/21-10:50:15.044 6b5 Level-0 table #34: started
+2025/07/21-10:50:15.057 6b5 Level-0 table #34: 176880 bytes OK
+2025/07/21-10:50:15.059 6b5 Delete type=0 #30
+2025/07/21-10:54:00.877 6b5 Level-0 table #36: started
+2025/07/21-10:54:00.886 6b5 Level-0 table #36: 177127 bytes OK
+2025/07/21-10:54:00.888 6b5 Delete type=0 #33
+2025/07/21-10:54:00.888 6b5 Compacting 4@0 + 1@1 files
+2025/07/21-10:54:00.894 6b5 Generated table #37@0: 45 keys, 189009 bytes
+2025/07/21-10:54:00.894 6b5 Compacted 4@0 + 1@1 files => 189009 bytes
+2025/07/21-10:54:00.895 6b5 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/07/21-10:54:00.895 6b5 Delete type=2 #29
+2025/07/21-10:54:00.895 6b5 Delete type=2 #36
+2025/07/21-10:54:00.895 6b5 Delete type=2 #31
+2025/07/21-10:54:00.895 6b5 Delete type=2 #27
+2025/07/21-10:54:00.895 6b5 Delete type=2 #34

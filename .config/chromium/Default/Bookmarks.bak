@@ -1,0 +1,58 @@
+{
+   "checksum": "c07bdb89cc2f954075948973a2a78424",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "date_added": "13397546211417843",
+            "date_last_used": "0",
+            "guid": "2b73678d-890d-4e82-96c3-f8757dc76cee",
+            "id": "5",
+            "meta_info": {
+               "power_bookmark_meta": ""
+            },
+            "name": "GitHub · Build and ship software on a single, collaborative platform · GitHub",
+            "type": "url",
+            "url": "https://github.com/"
+         }, {
+            "date_added": "13397547201174494",
+            "date_last_used": "0",
+            "guid": "2b7b9415-2a71-49e7-ab6b-abf0b4c73003",
+            "id": "6",
+            "meta_info": {
+               "power_bookmark_meta": ""
+            },
+            "name": ".dotfiles/waybar/.config/waybar at main · rocketmike12/.dotfiles",
+            "type": "url",
+            "url": "https://github.com/rocketmike12/.dotfiles/tree/main/waybar/.config/waybar"
+         } ],
+         "date_added": "13397545658371433",
+         "date_last_used": "0",
+         "date_modified": "13397547201174494",
+         "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+         "id": "1",
+         "name": "Bookmarks bar",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_added": "13397545658371433",
+         "date_last_used": "0",
+         "date_modified": "13397546211417843",
+         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
+         "id": "2",
+         "name": "Other bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13397545658371433",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
+         "id": "3",
+         "name": "Mobile bookmarks",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}
